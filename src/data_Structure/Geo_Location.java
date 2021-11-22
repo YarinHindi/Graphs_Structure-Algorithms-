@@ -13,6 +13,10 @@ public class Geo_Location implements GeoLocation {
         this.location = new Point3D(0.0,0.0,0.0);
     }
 
+    public Geo_Location(Geo_Location other){
+        this.location= new Point3D(other.x(),other.y(),other.z());
+    }
+
     @Override
     public double x() {
         return this.location.getX();
