@@ -34,6 +34,7 @@ public class Geo_Location implements GeoLocation {
 
     @Override
     public double distance(GeoLocation g) {
+        
         return this.location.distance(g.x(),g.y(),g.z());
     }
 }
