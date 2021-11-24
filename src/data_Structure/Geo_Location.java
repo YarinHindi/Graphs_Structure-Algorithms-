@@ -13,7 +13,7 @@ public class Geo_Location implements GeoLocation {
         this.location = new Point3D(0.0,0.0,0.0);
     }
 
-    public Geo_Location(Geo_Location other){
+    public Geo_Location(GeoLocation other){
         this.location= new Point3D(other.x(),other.y(),other.z());
     }
 

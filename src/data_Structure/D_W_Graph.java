@@ -3,6 +3,7 @@ package data_Structure;
 import api.DirectedWeightedGraph;
 import api.EdgeData;
 import api.NodeData;
+import java.util.Iterator;
 import javafx.geometry.Point3D;
 //import Node_Data;
 
@@ -78,41 +79,78 @@ public class D_W_Graph implements DirectedWeightedGraph {
 
     @Override
     public Iterator<NodeData> nodeIter() {
-        return null;
+        return this.node_map.values().iterator();
+
+
     }
 
     @Override
     public Iterator<EdgeData> edgeIter() {
-        return null;
+        ArrayList<EdgeData> ans= new ArrayList<>();
+        Set set = this.edege_map.keySet();
+        Iterator iter = set.iterator();
+        while(iter.hasNext()){
+            Iterator edge_iter = this.edgeIter((int)iter.next());
+            while(edge_iter.hasNext()){
+                ans.add((EdgeData)edge_iter.next());
+            }
+        }
+        return ans.iterator();
+
     }
 
     @Override
     public Iterator<EdgeData> edgeIter(int node_id) {
-        return null;
+
+        return this.edege_map.get(node_id).values().iterator();
     }
 
     @Override
     public NodeData removeNode(int key) {
-        return null;
+        try{
+            NodeData temp =this.node_map.get(key);
+            Set holds = this.edege_map.get(key).keySet();
+            Iterator iters  = holds.iterator();
+            while(iters.hasNext()){
+                  this.removeEdge(key,(int)iters.next());
+            }
+            this.node_map.remove(key);
+            this.nodeSize--;
+            this.MC++;
+            return  temp;
+
+        }catch(NullPointerException e){
+            return null;
+        }
     }
 
     @Override
     public EdgeData removeEdge(int src, int dest) {
-        return null;
+        try {
+            EdgeData temp = getEdge(src, dest);
+            this.edege_map.get(src).remove(dest);
+            this.edgeSize--;
+            this.MC++;
+            return temp;
+
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     @Override
     public int nodeSize() {
-        return 0;
+        return this.nodeSize;
     }
 
     @Override
     public int edgeSize() {
-        return 0;
+        return this.edgeSize;
     }
 
     @Override
     public int getMC() {
-        return 0;
+
+        return this.MC;
     }
 }
