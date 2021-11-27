@@ -70,7 +70,7 @@ public class Edge_Data implements EdgeData {
         this.tag=t;
     }
     public String toString(){
-        return "<" + this.getSrc() + "," + this.getDest() + "," + this.getWeight() + ">";
+        return "(" + this.getSrc() + " , " + this.getDest() + " , " + this.getWeight() + ")";
     }
 }
 

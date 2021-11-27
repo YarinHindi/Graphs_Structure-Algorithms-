@@ -4,37 +4,60 @@ import api.GeoLocation;
 import javafx.geometry.Point3D;
 public class Geo_Location implements GeoLocation {
 
-    private Point3D location;
+    private double x;
+    private double y;
+    private double z;
+
 
     public Geo_Location(double x,double y,double z){
-       this.location = new Point3D(x,y,z);
+       this.x=x;
+       this.y=y;
+       this.z=z;
     }
     public Geo_Location(){
-        this.location = new Point3D(0.0,0.0,0.0);
+        this.x=0;
+        this.y=0;
+        this.z=0;
     }
 
     public Geo_Location(GeoLocation other){
-        this.location= new Point3D(other.x(),other.y(),other.z());
+
+        this.x = other.x();
+        this.y = other.y();
+        this.z = other.z();
+
     }
 
     @Override
     public double x() {
-        return this.location.getX();
+        return this.x;
     }
 
     @Override
     public double y() {
-        return this.location.getY();
+
+        return this.y;
     }
 
     @Override
     public double z() {
-        return this.location.getZ();
+
+        return this.z;
     }
 
     @Override
     public double distance(GeoLocation g) {
+        double xval = Math.pow((g.x()-this.x),2);
+        double yval = Math.pow((g.y()-this.y),2);
+        double zval = Math.pow((g.z()-this.z),2);
         
-        return this.location.distance(g.x(),g.y(),g.z());
+        return Math.sqrt(xval+yval+zval);
+
+
     }
+    public String toString(){
+        return "(" + this.x() + "," + this.y() + "," + this.z() + ")";
+    }
+
+
 }

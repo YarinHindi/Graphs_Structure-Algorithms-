@@ -10,23 +10,23 @@ import javafx.geometry.Point3D;
 import java.util.*;
 
 /**
- * node_map - gonna represnt the node by a hash map,the key gonna be the node.key and the value gonna be the NodeData
- * edge_map - gonna represnt the edges between the node by a hash map,the key gonna be src node and the value
- * gonna be a hash map which is key gonna be the src node and the value gonna be the EdgeData.
+ * node_map - gonna represent the node by a hash map,the key gonna be the node.key and the value gonna be the NodeData
+ * edge_map - gonna represent the edges between the node by a hash map,the key gonna be src node and the value
+ * gonna be a hash map which is  the key gonna be the dest node and the value gonna be the EdgeData.
  * edgeSize - gonna help us later to know how much edge we got at all
  * nodeSize - same as edgeSize gonna help us later.
  * MC - with MC we track how many changes we made in the graph.
  */
 public class D_W_Graph implements DirectedWeightedGraph {
     private Map<Integer, NodeData> node_map = new HashMap<>();
-    private Map<Integer,HashMap<Integer,EdgeData>> edege_map = new HashMap<>();
+    private Map<Integer,HashMap<Integer,EdgeData>> edge_map = new HashMap<>();
     private int edgeSize;
     private int nodeSize;
     private int MC;
 
     public D_W_Graph(){
         this.node_map=new HashMap<>();
-        this.edege_map= new HashMap<>();
+        this.edge_map= new HashMap<>();
         this.edgeSize=0;
         this.nodeSize=0;
         this.MC=0;
@@ -43,7 +43,7 @@ public class D_W_Graph implements DirectedWeightedGraph {
     @Override
     public EdgeData getEdge(int src,int dest) {
         try {
-            return this.edege_map.get(src).get(dest);
+            return this.edge_map.get(src).get(dest);
         }catch(NullPointerException e){
                 return null;
         }
@@ -62,12 +62,12 @@ public class D_W_Graph implements DirectedWeightedGraph {
         if(w<0) throw new RuntimeException("edge weight must be positive");
      if(this.getNode(src)!=null&&this.getNode(dest)!=null){//check if node existing
          EdgeData temp = new Edge_Data(src,dest,w);
-         if(this.edege_map.get(src)==null){//there is no neighbors already to node src
+         if(this.edge_map.get(src)==null){//there is no neighbors already to node src
              HashMap<Integer,EdgeData> init = new HashMap<Integer,EdgeData>();
-             this.edege_map.put(src,init);
-             this.edege_map.get(src).put(dest,temp);
+             this.edge_map.put(src,init);
+             this.edge_map.get(src).put(dest,temp);
          }else{
-             this.edege_map.get(src).put(dest,temp);//if there is no edge we gonna add
+             this.edge_map.get(src).put(dest,temp);//if there is no edge we gonna add
                                                     //if there a edge we gonna add and replace to the new value
          }
          this.edgeSize++;
@@ -87,7 +87,7 @@ public class D_W_Graph implements DirectedWeightedGraph {
     @Override
     public Iterator<EdgeData> edgeIter() {
         ArrayList<EdgeData> ans= new ArrayList<>();
-        Set set = this.edege_map.keySet();
+        Set set = this.edge_map.keySet();
         Iterator iter = set.iterator();
         while(iter.hasNext()){
             Iterator edge_iter = this.edgeIter((int)iter.next());
@@ -102,22 +102,32 @@ public class D_W_Graph implements DirectedWeightedGraph {
     @Override
     public Iterator<EdgeData> edgeIter(int node_id) {
 
-        return this.edege_map.get(node_id).values().iterator();
+        return this.edge_map.get(node_id).values().iterator();
     }
 
     @Override
     public NodeData removeNode(int key) {
         try{
+
+            //remove to edge from this node to other nodes.
             NodeData temp =this.node_map.get(key);
-            Set holds = this.edege_map.get(key).keySet();
-            Iterator iters  = holds.iterator();
-            while(iters.hasNext()){
-                  this.removeEdge(key,(int)iters.next());
-            }
+            this.edgeSize-=this.edge_map.get(key).size();
+            this.edge_map.remove(key);
             this.node_map.remove(key);
             this.nodeSize--;
             this.MC++;
+            //remove all edge associated to that node.
+            Set set = this.edge_map.keySet();
+            Iterator iter = set.iterator();
+            while(iter.hasNext()){
+                int ind = (int)iter.next();
+                if(this.getEdge(ind,key)!=null){
+                    this.removeEdge(ind,key);
+                }
+            }
             return  temp;
+
+
 
         }catch(NullPointerException e){
             return null;
@@ -128,7 +138,7 @@ public class D_W_Graph implements DirectedWeightedGraph {
     public EdgeData removeEdge(int src, int dest) {
         try {
             EdgeData temp = getEdge(src, dest);
-            this.edege_map.get(src).remove(dest);
+            this.edge_map.get(src).remove(dest);
             this.edgeSize--;
             this.MC++;
             return temp;
