@@ -65,6 +65,10 @@ public class Edge_Data implements EdgeData {
         return this.tag;
     }
 
+    public void setW(double w){
+        this.weight=w;
+    }
+
     @Override
     public void setTag(int t) {
         this.tag=t;

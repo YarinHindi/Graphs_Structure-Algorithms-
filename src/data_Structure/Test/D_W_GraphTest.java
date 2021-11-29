@@ -1,5 +1,6 @@
 package data_Structure.Test;
 
+import api.NodeData;
 import data_Structure.D_W_Graph;
 import data_Structure.Edge_Data;
 import data_Structure.Geo_Location;
@@ -16,6 +17,8 @@ class D_W_GraphTest {
     Node_Data node = new Node_Data(new Geo_Location(1,2,3));
     Node_Data node2 = new Node_Data(new Geo_Location(4,5,6));
     Node_Data node3 = new Node_Data(new Geo_Location(1,1,1));
+    Node_Data node4 = new Node_Data(new Geo_Location(2,2,2));
+    Node_Data node5 = new Node_Data(new Geo_Location(3,3,3));
 
     @Test
     void getNode() {
@@ -47,11 +50,17 @@ class D_W_GraphTest {
     void nodeIter() {
         graph.addNode(node);
         graph.addNode(node2);
+        graph.addNode(node3);
+        graph.addNode(node4);
+        graph.addNode(node5);
         Iterator iter = graph.nodeIter();
         int i=1;
         while (iter.hasNext()){
-            assertEquals(graph.getNode(i),iter.next());
+            Node_Data nodecurr = (Node_Data) iter.next();
+            assertEquals(graph.getNode(i),nodecurr);
             i++;
+
+
         }
     }
 

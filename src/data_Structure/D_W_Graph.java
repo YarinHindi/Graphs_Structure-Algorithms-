@@ -24,6 +24,14 @@ public class D_W_Graph implements DirectedWeightedGraph {
     private int nodeSize;
     private int MC;
 
+
+    public D_W_Graph(D_W_Graph other){
+        this.node_map= other.node_map;
+        this.edge_map = other.edge_map;
+        this.edgeSize= other.edgeSize;
+        this.nodeSize= other.nodeSize;
+        this.MC=0;
+    }
     public D_W_Graph(){
         this.node_map=new HashMap<>();
         this.edge_map= new HashMap<>();
@@ -48,7 +56,6 @@ public class D_W_Graph implements DirectedWeightedGraph {
                 return null;
         }
     }
-
 
     @Override
     public void addNode(NodeData n) {
@@ -101,8 +108,11 @@ public class D_W_Graph implements DirectedWeightedGraph {
 
     @Override
     public Iterator<EdgeData> edgeIter(int node_id) {
-
-        return this.edge_map.get(node_id).values().iterator();
+        try {
+            return this.edge_map.get(node_id).values().iterator();
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     @Override
@@ -158,9 +168,11 @@ public class D_W_Graph implements DirectedWeightedGraph {
         return this.edgeSize;
     }
 
+
     @Override
     public int getMC() {
 
         return this.MC;
     }
+
 }

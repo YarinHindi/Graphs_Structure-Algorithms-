@@ -11,7 +11,12 @@ public class Node_Data implements NodeData {
     private String info;
     static public int key_track=1;
 
+    public Node_Data(int key){
+        this.key = key;
+        this.location = new Geo_Location(0,0,0);
+        this.weight=0;
 
+    }
     public Node_Data(Geo_Location location,double weight,String info){
         this.key = this.key_track;
         this.location = new Geo_Location(location);

@@ -56,7 +56,7 @@ public class Geo_Location implements GeoLocation {
 
     }
     public String toString(){
-        return "(" + this.x() + "," + this.y() + "," + this.z() + ")";
+        return "" + this.x() + "," + this.y() + "," + this.z() + "";
     }
 
 
