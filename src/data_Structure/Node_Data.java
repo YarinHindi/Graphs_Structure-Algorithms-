@@ -19,6 +19,7 @@ public class Node_Data implements NodeData {
     }
     public Node_Data(Geo_Location location,double weight,String info){
         this.key = this.key_track;
+        this.key_track++;
         this.location = new Geo_Location(location);
         this.weight=weight;
         this.info=info;

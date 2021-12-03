@@ -96,27 +96,29 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
 
         }
     }
-    public static int BFS(DirectedWeightedGraph g, NodeData node ) {
-        int ans=0;
+
+    public static int BFS(DirectedWeightedGraph g, NodeData node) {
+        int ans = 0;
         LinkedList<Integer> queue = new LinkedList<Integer>();
         node.setTag(1);
         queue.add(node.getKey());
         while (queue.size() != 0) {
             int curr = queue.poll();
             Iterator iter = g.edgeIter(curr);
-            while (iter.hasNext()){
+            while (iter.hasNext()) {
                 EdgeData edge = (Edge_Data) iter.next();
                 int u = edge.getDest();
                 if (g.getNode(u) != null && g.getNode(u).getTag() == 0) {
-                   g.getNode(u).setTag(1);
-                   queue.add(g.getNode(u).getKey());
-                   ans = g.getNode(u).getKey();
+                    g.getNode(u).setTag(1);
+                    queue.add(g.getNode(u).getKey());
+                    ans = g.getNode(u).getKey();
                 }
             }
         }
         return ans;
     }
-    public static  void DFS(DirectedWeightedGraph g, NodeData node) {
+
+    public static void DFS(DirectedWeightedGraph g, NodeData node) {
         node.setTag(1);
         Iterator iter = g.edgeIter(node.getKey());
         if (iter != null) {
@@ -205,7 +207,7 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
         while (firstInGTranspose.getKey() != src) {
             Iterator iter = copied.edgeIter(firstInGTranspose.getKey());
             double nodeWeighte = firstInGTranspose.getWeight();
-                if (iter != null) {
+            if (iter != null) {
                 while (iter.hasNext()) {
                     EdgeData edge = (Edge_Data) iter.next();
                     if (copied.getNode(edge.getDest()).getWeight() + edge.getWeight() == nodeWeighte) {
@@ -223,52 +225,84 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     }
 
     @Override
+//    public NodeData center() {
+//        if (this.graph.nodeSize() == 1 ) return this.graph.getNode(1);
+//        D_W_Graph_Algo algo = new D_W_Graph_Algo();
+//        algo.init(this.graph);
+//        if(algo.isConnected()==false||this.graph.nodeSize()==0) return null;
+//        NodeData node1 = this.graph.getNode(1);
+//        int first = BFS(this.graph,node1);
+//        NodeData node2 = this.graph.getNode(first);
+//        this.setValue();
+//        int second = BFS(this.graph,node2);
+////        NodeData node_out1 = this.graph.getNode(second);
+////        NodeData node_out2 = this.graph.getNode(first);
+//        NodeData node_out1 = this.graph.getNode(3);
+//        NodeData node_out2 = this.graph.getNode(4);
+//        this.setValue();
+//        node_out1.setWeight(0);
+//
+//        Dijkstra(node_out1, node_out2);
+//        Iterator iter = this.graph.nodeIter();
+//        Iterator iter1 = this.graph.nodeIter();
+//        Iterator iter2 = this.graph.nodeIter();
+//        int ind = 0;
+//        double maxs = Integer.MIN_VALUE;
+//        double mins = Integer.MAX_VALUE;
+//        double stating_weight = node_out1.getWeight();
+//        while (iter.hasNext()) {
+//            NodeData node = (NodeData) iter.next();
+//            double weight = node.getWeight();
+//            if (maxs < weight) {
+//                maxs = weight;
+//            }
+//
+//        }
+//        while (iter1.hasNext()) {
+//            NodeData node = (NodeData) iter1.next();
+//            double weight = node.getWeight();
+//            double max = Math.max(weight - stating_weight, maxs - weight);
+//            node.setWeight(max);
+//        }
+//        while (iter2.hasNext()) {
+//            NodeData node = (NodeData) iter2.next();
+//            double weight = node.getWeight();
+//            if (mins > weight) {
+//                ind = node.getKey();
+//                mins = weight;
+//            }
+//        }
+//
+//        return this.graph.getNode(ind);
+//    }
     public NodeData center() {
-        if (this.graph.nodeSize() == 1 ) return this.graph.getNode(1);
-        D_W_Graph_Algo algo = new D_W_Graph_Algo();
-        algo.init(this.graph);
-        if(algo.isConnected()==false||this.graph.nodeSize()==0) return null;
-        NodeData node1 = this.graph.getNode(1);
-        int first = BFS(this.graph,node1);
-        NodeData node2 = this.graph.getNode(first);
-        this.setValue();
-        int second = BFS(this.graph,node2);
-        NodeData node_out1 = this.graph.getNode(second);
-        NodeData node_out2 = this.graph.getNode(first);
-        this.setValue();
-        node_out1.setWeight(0);
-        Dijkstra(node_out1, node_out2);
-        Iterator iter = this.graph.nodeIter();
-        Iterator iter1 = this.graph.nodeIter();
-        Iterator iter2 = this.graph.nodeIter();
-        int ind = 0;
-        double maxs = Integer.MIN_VALUE;
-        double mins = Integer.MAX_VALUE;
-        double stating_weight = node_out1.getWeight();
-        while (iter.hasNext()) {
-            NodeData node = (NodeData) iter.next();
-            double weight = node.getWeight();
-            if (maxs < weight) {
-                maxs = weight;
+        double arr[] = new double[this.graph.nodeSize()];
+        double max;
+        double min;
+        int ind =0;
+        for (int i = 1; i <= this.graph.nodeSize(); i++) {
+            max = Integer.MIN_VALUE;
+            for (int j = 1; j <= this.graph.nodeSize(); j++) {
+                double dist = this.shortestPathDist(i, j);
+                if (max < dist) {
+                    max = dist;
+                    arr[i-1]=max;
+                }
+
+
+            }
+        }
+        min= Integer.MAX_VALUE;
+        for (int i = 0; i < arr.length; i++) {
+            if(min>arr[i]){
+                min = arr[i];
+                ind = i+1 ;
             }
 
         }
-        while (iter1.hasNext()) {
-            NodeData node = (NodeData) iter1.next();
-            double weight = node.getWeight();
-            double max = Math.max(weight - stating_weight, maxs - weight);
-            node.setWeight(max);
-        }
-        while (iter2.hasNext()) {
-            NodeData node = (NodeData) iter2.next();
-            double weight = node.getWeight();
-            if (mins > weight) {
-                ind = node.getKey();
-                mins = weight;
-            }
-        }
-
         return this.graph.getNode(ind);
+
+
     }
 
     @Override

@@ -23,6 +23,12 @@ public class D_W_Graph implements DirectedWeightedGraph {
     private int edgeSize;
     private int nodeSize;
     private int MC;
+    private boolean edgeIterByKey;
+    private boolean edgeIterAll;
+    private boolean nodeIter;
+    //for all Iterator maybe we need to use a thread to tell us if the graph is been changes since the
+    //Iterator has been constructed in iff some changes acquired we goona throw a runtimeException.
+    //thread should be listen to function (addNode-connect-removeNode-removeEdge)
 
 
     public D_W_Graph(D_W_Graph other){
@@ -77,6 +83,7 @@ public class D_W_Graph implements DirectedWeightedGraph {
              this.edge_map.get(src).put(dest,temp);//if there is no edge we gonna add
                                                     //if there a edge we gonna add and replace to the new value
          }
+         //if there is a edge check and not add to edgesize++;
          this.edgeSize++;
          this.MC++;
      }else {
@@ -118,8 +125,8 @@ public class D_W_Graph implements DirectedWeightedGraph {
     @Override
     public NodeData removeNode(int key) {
         try{
-
             //remove to edge from this node to other nodes.
+
             NodeData temp =this.node_map.get(key);
             this.edgeSize-=this.edge_map.get(key).size();
             this.edge_map.remove(key);
