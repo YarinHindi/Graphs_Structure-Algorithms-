@@ -37,15 +37,18 @@ class D_W_Graph_AlgoTest {
 
     @Test
     void isConnected() {
+//        graph = new D_W_Graph();
+//        algo = new D_W_Graph_Algo();
+//        graph.addNode(node1);
+//        graph.addNode(node2);
+//        graph.addNode(node3);
+//        graph.connect(1,2,3);
+//        graph.connect(2,3,2);
+//        graph.connect(3,1,3);
+//        algo.init(graph);
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        graph.addNode(node1);
-        graph.addNode(node2);
-        graph.addNode(node3);
-        graph.connect(1,2,3);
-        graph.connect(2,3,2);
-        graph.connect(3,1,3);
-        algo.init(graph);
+        algo.load("C:\\Users\\yarin\\Desktop\\1000Nodes.json");
         assertEquals(algo.isConnected(),true);
 
     }
@@ -97,23 +100,29 @@ class D_W_Graph_AlgoTest {
 
     @Test
     void shortestPathDist() {
-        graph = new D_W_Graph();
+//        graph = new D_W_Graph();
 //        algo = new D_W_Graph_Algo();
 //        graph.addNode(node1);
 //        graph.addNode(node2);
 //        graph.addNode(node3);
 //        graph.addNode(node4);
-//        graph.connect(1,2,1);
-//        graph.connect(2,3,1);
-//        graph.connect(3,2,10);
+//        graph.addNode(node5);
+//        graph.connect(0,1,1);
+//        graph.connect(1,0,1);
+//        graph.connect(0,3,2);
+//        graph.connect(0,2,4);
+//        graph.connect(2,4,7);
+//        graph.connect(3,0,2);
+//        graph.connect(2,0,4);
+//        graph.connect(4,2,7);
 //     ///   graph.connect(1,3,3);
 //        algo.init(graph);
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
         algo.load("C:\\Users\\yarin\\Desktop\\1000Nodes.json");
-        System.out.println(algo.shortestPathDist(3, 7));
         List<NodeData> list = algo.shortestPath(3, 7);
-
+//         double a= algo.shortestPathDist(0, 1);
+  //       System.out.println(a);
         String ans ="";
         int check=0;
         for (int i = 0; i < list.size(); i++) {
@@ -161,34 +170,11 @@ class D_W_Graph_AlgoTest {
 
     @Test
     void center() {
-//        graph = new D_W_Graph();
-//        algo = new D_W_Graph_Algo();
-//        graph.addNode(node1);
-//        graph.addNode(node2);
-//        graph.addNode(node3);
-//        graph.addNode(node4);
-//        graph.addNode(node5);
-//     //   graph.addNode(node6);
-//        graph.connect(1,4,1);
-//        graph.connect(4,3,2);
-//        graph.connect(3,5,9);
-//        graph.connect(5,2,4);
-//        graph.connect(2,1,3);
-//        graph.connect(2,3,1);
-//        graph.connect(3,1,7);
-//        algo.init(graph);
-//        assertEquals(algo.center().getKey(),5);
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        algo.init(graph);
-        algo.load("C:\\Users\\yarin\\Desktop\\1000Nodes.json");
-    //    System.out.println(algo.center());
-        double list= algo.shortestPathDist2(3,7);
- //       double list2= algo.shortestPathDist(3,7);
-        System.out.println(list);
-//          System.out.println(list2);
-      //  System.out.println(list);
- //            assertEquals(algo.center().getKey(),362);
+    //    algo.init(graph);
+        algo.load("C:\\Users\\yarin\\Desktop\\10000Nodes.json");
+           assertEquals(algo.center().getKey(),3846);
     }
 
     @Test

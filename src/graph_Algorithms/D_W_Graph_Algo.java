@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.*;
 import data_Structure.*;
 
+import javax.swing.text.html.HTMLDocument;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -17,11 +18,7 @@ import java.util.*;
 
 public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     private DirectedWeightedGraph graph;
-    //This field is intended to keep weights the lowest weight path between two nodes in the graph.
-    private HashMap<Integer, NodeDistance> weights = new HashMap<>();
 
-    //This field is intended to keep parent nodes in the lowest weight path between two nodes in the graph.
-    private HashMap<Integer, Integer> parents = new HashMap<>();
 
 
     public D_W_Graph_Algo() {
@@ -171,6 +168,98 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
         }
     }
 
+    public void DijkstraForShortestPath(Node_Data src, Node_Data dest) {
+        PriorityQueue<NodeData> pq = new PriorityQueue<>();
+        pq.add(src);
+        while (pq.size() != 0) {
+            Node_Data node = (Node_Data) pq.poll();
+            this.graph.getNode(node.getKey()).setTag(1);
+            if (node.getKey() == dest.getKey()) {
+                return;
+            }
+            Iterator iter = this.graph.edgeIter(node.getKey());
+            while (iter.hasNext()) {
+                EdgeData edge = (EdgeData) iter.next();
+                double weight_check = node.getWeight() + edge.getWeight();
+                if (this.graph.getNode(edge.getDest()).getWeight() == Double.MAX_VALUE) {
+                    pq.add(this.graph.getNode(edge.getDest()));
+                }
+                if (this.graph.getNode(edge.getDest()).getWeight() > weight_check) {
+                    this.graph.getNode(edge.getDest()).setWeight(weight_check);
+                }
+            }
+        }
+    }
+        public void DijkstraForCenter(int key){
+        PriorityQueue<NodeData> PQ = new PriorityQueue<>();
+        //Update the weight of each node to infinity and update the color(info) of all the nodes to white.
+        //White node - means we have not visited it yet.
+        setValue();
+        this.graph.getNode(key).setWeight(0);
+        //weights.get(key).setDistance(0);
+        PQ.add(this.graph.getNode(key));
+        //A loop that goes through all the nodes in the graph.
+        while (PQ.size() != 0) {
+            NodeData u = PQ.poll();
+            //Black node - means we have updated the minimum weight of the node
+            if (!(this.graph.getNode(u.getKey()).getTag()==1)) {
+                Iterator iter2 = this.graph.edgeIter(u.getKey());
+                while (iter2.hasNext()) {
+                    EdgeData ni = (EdgeData) iter2.next();
+                    if (!(this.graph.getNode(ni.getDest()).getTag()==1)) {
+                        double t = ni.getWeight() + this.graph.getNode(u.getKey()).getWeight();
+                        //Update the min weight of the neighbors of node u.
+                        if (this.graph.getNode(ni.getDest()).getWeight() > t) {
+                            this.graph.getNode(ni.getDest()).setWeight(t);
+                            //Update the parent node of edge ni.
+                            //parents.put(ni.getDest(), u.getK());
+                        }
+                        PQ.add(this.graph.getNode(ni.getDest()));
+                    }
+                }
+            }
+            this.graph.getNode(u.getKey()).setTag(1);
+        }
+    }
+
+    public double shortestPathDist(int src, int dest) {
+        if (this.graph.getNode(src) != null && this.graph.getNode(dest) != null){
+            //The weight of the path of a node to itself is 0.
+            if (src == dest){
+                return 0;
+            }
+            //setValue();
+            NodeData node = this.graph.getNode(src);
+            node.setWeight(0);
+            DijkstraForShortestPath((Node_Data) this.graph.getNode(src),(Node_Data) this.graph.getNode(dest));
+            //If the weight of dest different from infinitely,
+            // we will return the weight of the path from the node from which we scanned the graph(src) to dest
+            if (this.graph.getNode(dest).getWeight() != Double.MAX_VALUE) {
+                return this.graph.getNode(dest).getWeight();
+            }
+            else {
+                return -1;
+            }
+        }
+        else {
+            return -1;
+        }
+    }
+    public double shortestPathDist3(int src, int dest) {
+        if (src == dest) return 0;
+        setValue();
+        NodeData node = this.graph.getNode(src);
+        node.setWeight(0);
+        DijkstraForCenter(src);
+        //Dijkstra2(src);
+        double ans = this.graph.getNode(dest).getWeight();
+        if (ans == Double.MAX_VALUE) {
+            return -1;
+        } else {
+            return ans;
+        }
+    }
+
     private void Dijkstra(NodeData src, NodeData dest) {
         if (src.getKey() == dest.getKey() && src.getTag() == 1) return;
         Iterator iter = this.graph.edgeIter(src.getKey());
@@ -183,88 +272,13 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
                     Dijkstra(this.graph.getNode(edge.getDest()), dest);
                 }
             }
+
         }
     }
-
-
-    public void Dijkstra2(int key) {
-        PriorityQueue<NodeDistance> PQ = new PriorityQueue<>();
-        //Update the weight of each node to infinity and update the color(info) of all the nodes to white.
-        //White node - means we have not visited it yet.
-        Iterator iter = this.graph.nodeIter();
-        while (iter.hasNext()) {
-            NodeData n = (NodeData) iter.next();
-            n.setInfo("White");
-            weights.put(n.getKey(), new NodeDistance(n.getKey(), Double.MAX_VALUE));
-        }
-        //Update the weight of the node from which we will start scanning the graph to 0.
-        weights.get(key).setDistance(0);
-        PQ.add(weights.get(key));
-
-        //A loop that goes through all the nodes in the graph.
-        while (PQ.size() != 0) {
-            NodeDistance u = PQ.poll();
-            //Black node - means we have updated the minimum weight of the node
-            if (!(this.graph.getNode(u.getK()).getInfo().equals("Black"))) {
-                Iterator iter2 = this.graph.edgeIter(u.getK());
-                while (iter2.hasNext()) {
-                    EdgeData ni = (EdgeData) iter2.next();
-                    if (!((this.graph.getNode(ni.getDest()).getInfo()).equals("Black"))) {
-                        double t = ni.getWeight() + weights.get(u.getK()).getDistance();
-                        //Update the min weight of the neighbors of node u.
-                        if (weights.get(ni.getDest()).getDistance() > t) {
-                            weights.get(ni.getDest()).setDistance(t);
-                            //Update the parent node of edge ni.
-                            parents.put(ni.getDest(), u.getK());
-                        }
-                        PQ.add(weights.get(ni.getDest()));
-                    }
-                }
-            }
-            this.graph.getNode(u.getK()).setInfo("Black");
-        }
-    }
-
-
-    public double shortestPathDist2(int src, int dest) {
-
-        if (this.graph.getNode(src) != null && this.graph.getNode(dest) != null){
-            //The weight of the path of a node to itself is 0.
-            if (src == dest){
-                return 0;
-            }
-            Dijkstra2(src);
-            //If the weight of dest different from infinitely,
-            // we will return the weight of the path from the node from which we scanned the graph(src) to dest
-            if (weights.get(dest).getDistance()!= Double.MAX_VALUE){
-                weights.get(dest).getDistance();
-            }
-        }
-        //If there is no path between the two vertices we will return -1
-        return -1;
-    }
-
-
-    @Override
-    public double shortestPathDist(int src, int dest) {
-        if (src == dest) return 0;
-        setValue();
-        NodeData node = this.graph.getNode(src);
-        node.setWeight(0);
-        Dijkstra(node, this.graph.getNode(dest));
-        //Dijkstra2(src);
-        double ans = this.graph.getNode(dest).getWeight();
-        if (ans == Double.MAX_VALUE) {
-            return -1;
-        } else {
-            return ans;
-        }
-    }
-
     @Override
     public List<NodeData> shortestPath(int src, int dest) {
         List<NodeData> nodePathReavrse = new ArrayList<>();
-        double time = this.shortestPathDist(src, dest);
+        double time = this.shortestPathDist3(src, dest);
         if (time == -1) {
             return null;
         }
@@ -280,7 +294,7 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
                     EdgeData edge = (Edge_Data) iter.next();
                     double t = copied.getNode(edge.getDest()).getWeight();
                     double t2 = edge.getWeight();
-                       double val =copied.getNode(edge.getDest()).getWeight() + edge.getWeight();
+                    double val =copied.getNode(edge.getDest()).getWeight() + edge.getWeight();
                     if (val == nodeWeighte) {
                         firstInGTranspose = copied.getNode(edge.getDest());
                     }
@@ -296,31 +310,23 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     }
 
     public NodeData center() {
-     //   if(algo.isConnected()==false||this.graph.nodeSize()==0) return null;
-        double arr[] = new double[this.graph.nodeSize()];
-        double max;
-        double min;
-        int ind =0;
+        if(this.isConnected()==false||this.graph.nodeSize()==0) return null;
+        double min = Double.MAX_VALUE;
+        int ind =7;
         for (int i = 0; i < this.graph.nodeSize(); i++) {
-            max = Integer.MIN_VALUE;
+            DijkstraForCenter(i);
+            double max = Double.MIN_VALUE;
             for (int j = 0; j < this.graph.nodeSize(); j++) {
-                double dist = this.shortestPathDist(i, j);
-           //     System.out.println(dist);
-                if (max < dist) {
-                    max = dist;
-                    arr[i]=max;
+
+                double len = this.graph.getNode(j).getWeight();
+                if (max < len) {
+                    max = len;
                 }
-
-
             }
-        }
-        min= Integer.MAX_VALUE;
-        for (int i = 0; i < arr.length; i++) {
-            if(min>arr[i]){
-                min = arr[i];
-                ind = i ;
+            if (min > max) {
+                min = max;
+                ind = i;
             }
-
         }
         return this.graph.getNode(ind);
 
@@ -414,7 +420,7 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     public boolean load(String file) {
         try
         {
-             DirectedWeightedGraph loaded = new D_W_Graph();
+            DirectedWeightedGraph loaded = new D_W_Graph();
 
             JsonParser jsonParser = new JsonParser();
             FileReader reader = new FileReader(file);
@@ -424,7 +430,7 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             JsonObject vertex = new JsonObject();
             JsonObject edges = new JsonObject();
             JsonObject jsonObject = (JsonObject) obj;
-      //      jsonObject.getAsJsonObject(jsonString);
+            //      jsonObject.getAsJsonObject(jsonString);
 
 
             JsonArray vertexArray = jsonObject.getAsJsonArray("Nodes");

@@ -3,7 +3,7 @@ package data_Structure;
 import api.GeoLocation;
 import api.NodeData;
 
-public class Node_Data implements NodeData{
+public class Node_Data implements NodeData,Comparable<NodeData>{
     private int key;
     private Geo_Location location;
     private double weight;
@@ -88,6 +88,20 @@ public class Node_Data implements NodeData{
         return this.tag;
     }
 
+    @Override
+    public int compareTo(NodeData nodeDistance) {
+        int ans = 0;
+        //if the distance of this node distance is bigger return 1
+        if (this.getWeight()- nodeDistance.getWeight() > 0){
+            ans = 1;
+        }
+        //if the distance of this node distance is smaller return -1
+        else if (this.getWeight()- nodeDistance.getWeight() < 0){
+            ans = -1;
+        }
+        //if the distance of this node info equals to the distance of node_info n return 0
+        return ans;
+    }
 
 
     @Override
