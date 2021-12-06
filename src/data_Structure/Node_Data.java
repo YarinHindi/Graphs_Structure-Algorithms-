@@ -3,13 +3,13 @@ package data_Structure;
 import api.GeoLocation;
 import api.NodeData;
 
-public class Node_Data implements NodeData {
+public class Node_Data implements NodeData{
     private int key;
     private Geo_Location location;
     private double weight;
     private int tag;
     private String info;
-    static public int key_track=1;
+    static public int key_track=0;
 
     public Node_Data(int key){
         this.key = key;
@@ -87,6 +87,8 @@ public class Node_Data implements NodeData {
     public int getTag() {
         return this.tag;
     }
+
+
 
     @Override
     public void setTag(int t) {

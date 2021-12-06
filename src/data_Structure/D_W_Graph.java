@@ -23,9 +23,11 @@ public class D_W_Graph implements DirectedWeightedGraph {
     private int edgeSize;
     private int nodeSize;
     private int MC;
-    private boolean edgeIterByKey;
-    private boolean edgeIterAll;
-    private boolean nodeIter;
+    public boolean edgeIterByKeyflag=false;
+    public boolean edgeIterAllflag=false;
+    public boolean nodeIterflag=false;
+    private int keepCurrEdge=0;
+
     //for all Iterator maybe we need to use a thread to tell us if the graph is been changes since the
     //Iterator has been constructed in iff some changes acquired we goona throw a runtimeException.
     //thread should be listen to function (addNode-connect-removeNode-removeEdge)
@@ -65,6 +67,7 @@ public class D_W_Graph implements DirectedWeightedGraph {
 
     @Override
     public void addNode(NodeData n) {
+   //     if(this.nodeIterflag==true) throw new RuntimeException("Iterator has been constructed cant add node ");
           this.node_map.put(n.getKey(),n);
           this.nodeSize++;
           this.MC++;
@@ -72,6 +75,8 @@ public class D_W_Graph implements DirectedWeightedGraph {
 
     @Override
     public void connect(int src, int dest, double w) {
+//        if (this.edgeIterAllflag==true)throw new RuntimeException("Iterator has been constructed cant add edge ");
+//        if (this.edgeIterByKeyflag==true&&this.keepCurrEdge==src)throw new RuntimeException("Iterator has been constructed cant add edge ");
         if(w<0) throw new RuntimeException("edge weight must be positive");
      if(this.getNode(src)!=null&&this.getNode(dest)!=null){//check if node existing
          EdgeData temp = new Edge_Data(src,dest,w);
@@ -93,29 +98,40 @@ public class D_W_Graph implements DirectedWeightedGraph {
 
     @Override
     public Iterator<NodeData> nodeIter() {
-        return this.node_map.values().iterator();
-
+        try {
+            this.nodeIterflag = true;
+            return this.node_map.values().iterator();
+        }catch (NullPointerException e){
+            return null;
+        }
 
     }
 
     @Override
     public Iterator<EdgeData> edgeIter() {
-        ArrayList<EdgeData> ans= new ArrayList<>();
-        Set set = this.edge_map.keySet();
-        Iterator iter = set.iterator();
-        while(iter.hasNext()){
-            Iterator edge_iter = this.edgeIter((int)iter.next());
-            while(edge_iter.hasNext()){
-                ans.add((EdgeData)edge_iter.next());
+        try {
+            this.edgeIterAllflag=true;
+            ArrayList<EdgeData> ans = new ArrayList<>();
+            Set set = this.edge_map.keySet();
+            Iterator iter = set.iterator();
+            while (iter.hasNext()) {
+                Iterator edge_iter = this.edgeIter((int) iter.next());
+                while (edge_iter.hasNext()) {
+                    ans.add((EdgeData) edge_iter.next());
+                }
             }
+            return ans.iterator();
+        }catch (NullPointerException e){
+            return null;
         }
-        return ans.iterator();
 
     }
 
     @Override
     public Iterator<EdgeData> edgeIter(int node_id) {
         try {
+            this.keepCurrEdge=node_id;
+            this.edgeIterByKeyflag=true;
             return this.edge_map.get(node_id).values().iterator();
         } catch (NullPointerException e) {
             return null;
@@ -124,6 +140,7 @@ public class D_W_Graph implements DirectedWeightedGraph {
 
     @Override
     public NodeData removeNode(int key) {
+
         try{
             //remove to edge from this node to other nodes.
 
@@ -134,14 +151,19 @@ public class D_W_Graph implements DirectedWeightedGraph {
             this.nodeSize--;
             this.MC++;
             //remove all edge associated to that node.
+            int check =0;
             Set set = this.edge_map.keySet();
             Iterator iter = set.iterator();
             while(iter.hasNext()){
                 int ind = (int)iter.next();
                 if(this.getEdge(ind,key)!=null){
                     this.removeEdge(ind,key);
+                    check++;
                 }
             }
+//            if(this.node_map.get(key)!=null&&this.nodeIterflag==true||this.edge_map.get(key)!=null&&(this.edgeIterByKeyflag==true&&this.keepCurrEdge==key)||this.edgeIterAllflag==true&&check>0){
+//                throw new RuntimeException("Iterator has been some action isn't valid");
+          //  }
             return  temp;
 
 
@@ -158,6 +180,9 @@ public class D_W_Graph implements DirectedWeightedGraph {
             this.edge_map.get(src).remove(dest);
             this.edgeSize--;
             this.MC++;
+//            if(this.edge_map.get(src).get(dest)!=null&&this.edgeIterByKeyflag==true&&this.keepCurrEdge==src||this.edge_map.get(src).get(dest)!=null&&this.edgeIterAllflag){
+//                throw new RuntimeException("Iterator has been some action isn't valid");
+//            }
             return temp;
 
         } catch (NullPointerException e) {
