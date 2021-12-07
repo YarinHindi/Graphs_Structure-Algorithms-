@@ -403,7 +403,7 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             }
             AllObj.add("Nodes", Nodes);
             try {
-                PrintWriter pw = new PrintWriter("graph.json");
+                PrintWriter pw = new PrintWriter(file);
                 pw.write(AllObj.toString());
                 pw.close();
             } catch (FileNotFoundException e) {

@@ -9,13 +9,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-public class Graph_panel extends JPanel {
+public class Graph_panel_no extends JPanel {
     HashMap<Integer, Geo_Location> Point2d = new HashMap<>();
     HashMap<Geo_Location, HashMap<Geo_Location, Edge_Data>> niber = new HashMap<>();
     JTextField text;
     JLabel l;
 
-    public Graph_panel(DirectedWeightedGraph graph) {
+    public Graph_panel_no(DirectedWeightedGraph graph) {
         Iterator iter = graph.nodeIter();
         while (iter.hasNext()) {
             Node_Data node = (Node_Data) iter.next();
@@ -31,7 +31,6 @@ public class Graph_panel extends JPanel {
                 } else {
                     niber.get((Geo_Location) node.getLocation()).put((Geo_Location) node1.getLocation(), edge);
                 }
-
             }
         }
     }
@@ -86,12 +85,8 @@ public class Graph_panel extends JPanel {
                 int[] ypoints = {(int)dest.y(), (int) ym, (int) yn};
                 g.fillPolygon(xpoints,ypoints,3);
                 g.setColor(Color.black);
-
             }
         }
-
-
     }
-
 }
 
