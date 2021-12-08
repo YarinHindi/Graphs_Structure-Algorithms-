@@ -159,7 +159,7 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
         }
     }
 
-    private void setValue() {
+    public void setValue() {
         Iterator iter = this.graph.nodeIter();
         while (iter.hasNext()) {
             NodeData node = (NodeData) iter.next();
