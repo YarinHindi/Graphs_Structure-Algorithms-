@@ -11,6 +11,11 @@ public class Node_Data implements NodeData,Comparable<NodeData>{
     private String info;
     static public int key_track=0;
 
+
+    public  Node_Data(Geo_Location location,int key){
+       this.location=location;
+       this.key=key;
+    }
     public Node_Data(int key){
         this.key = key;
         this.location = new Geo_Location(0,0,0);

@@ -1,5 +1,7 @@
+import Garph_GUI.GUI;
 import api.DirectedWeightedGraphAlgorithms;
 import api.DirectedWeightedGraph;
+import graph_Algorithms.D_W_Graph_Algo;
 
 /**
  * This class is the main class for Ex2 - your implementation will be tested using this class.
@@ -12,9 +14,9 @@ public class Ex2 {
      */
     public static DirectedWeightedGraph getGrapg(String json_file) {
         DirectedWeightedGraph ans = null;
-        // ****** Add your code here ******
-        //
-        // ********************************
+        DirectedWeightedGraphAlgorithms algo = new D_W_Graph_Algo();
+        algo.load(json_file);
+        ans = algo.getGraph();
         return ans;
     }
     /**
@@ -24,9 +26,8 @@ public class Ex2 {
      */
     public static DirectedWeightedGraphAlgorithms getGrapgAlgo(String json_file) {
         DirectedWeightedGraphAlgorithms ans = null;
-        // ****** Add your code here ******
-        //
-        // ********************************
+        ans = new D_W_Graph_Algo();
+        ans.load(json_file);
         return ans;
     }
     /**
@@ -36,8 +37,11 @@ public class Ex2 {
      */
     public static void runGUI(String json_file) {
         DirectedWeightedGraphAlgorithms alg = getGrapgAlgo(json_file);
-        // ****** Add your code here ******
-        //
-        // ********************************
+        GUI graph_gui = new GUI();
+        graph_gui.load_from_json(json_file);
+    }
+
+    public static void main(String[] args) {
+        runGUI("C:\\Users\\matan\\IdeaProjects\\Graphs_Structure-Algorithms-\\data\\G3.json");
     }
 }

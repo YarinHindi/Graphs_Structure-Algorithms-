@@ -41,6 +41,9 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     }
 
     @Override
+    /**
+     * this function compute a deep copy of the graph.
+     */
     public DirectedWeightedGraph copy() {
         DirectedWeightedGraph deepCopy = new D_W_Graph();
         Iterator iter = this.graph.nodeIter();
@@ -58,12 +61,14 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     }
 
     @Override
-    //check if graph G is strongly connected
-    //we going to run DFS twice first time: starting from random vertex v if there is no path from 'v' to all node
-    // the graph is not connected. if there is path to every node  we going to run DFS for the second time but now for
-    // the graph G transpose and we gonna start DFS with 'v' and if in G transpose 'v' didnt reach all node
-    ///it means that in the original graph G there is some vertix 'u' who dosent have a path from 'u' to 'v'
-    //there for the graph isnt connected if the graph pass both DFS means the graph strongly connected
+    /**  This function check if graph G is strongly connected
+     we going to run DFS twice first time: starting from random vertex v if there is no path from 'v' to all node
+     the graph is not connected. if there is path to every node  we going to run DFS for the second time but now for
+     the graph G transpose and we gonna start DFS with 'v' and if in G transpose 'v' didnt reach all node
+     /it means that in the original graph G there is some vertix 'u' who dosent have a path from 'u' to 'v'
+     there for the graph isnt connected if the graph pass both DFS means the graph strongly connected
+     *
+     */
     public boolean isConnected() {
         if (this.graph.nodeSize() == 1 || this.graph.nodeSize() == 0) return true;
         DirectedWeightedGraph copy = this.copy();
@@ -87,6 +92,11 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
 
     }
 
+    /**
+     *
+     * @param g The graph we are working on right now
+     *          this function set all node's to 0 means they are not yet visited.
+     */
     private void setTagzero(DirectedWeightedGraph g) {
         Iterator iter = g.nodeIter();
         while (iter.hasNext()) {
@@ -96,29 +106,13 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
 
         }
     }
-
-    public static int BFS(DirectedWeightedGraph g, NodeData node) {
-        int ans = 0;
-        LinkedList<Integer> queue = new LinkedList<Integer>();
-        node.setTag(1);
-        queue.add(node.getKey());
-        while (queue.size() != 0) {
-            int curr = queue.poll();
-            Iterator iter = g.edgeIter(curr);
-            while (iter.hasNext()) {
-                EdgeData edge = (Edge_Data) iter.next();
-                int u = edge.getDest();
-                if (g.getNode(u) != null && g.getNode(u).getTag() == 0) {
-                    g.getNode(u).setTag(1);
-                    queue.add(g.getNode(u).getKey());
-                    ans = g.getNode(u).getKey();
-                }
-            }
-        }
-        return ans;
-    }
-
-    public static void DFS(DirectedWeightedGraph g, NodeData node) {
+    /**
+     *
+     * @param g The graph we are checking
+     * @param node starting node for traversal
+     *        the function doing the classic DFS
+     */
+    public  void DFS(DirectedWeightedGraph g, NodeData node) {
         node.setTag(1);
         Iterator iter = g.edgeIter(node.getKey());
         if (iter != null) {
@@ -132,8 +126,14 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             }
         }
     }
-
-    private void G_transopse(DirectedWeightedGraph g) {
+    /**
+     * @param g The graph we want to transpose.
+     *          we're changing the direction of the edge
+     *          if the edge existed between two node for both way(a->b,b->) we are just swapping
+     *          between the edge weight.
+     *          if only one way existed between the node we're removing the edge and connect it the opposite way.
+     */
+    public void G_transopse(DirectedWeightedGraph g) {
 
         Iterator iter = g.edgeIter();
         while (iter.hasNext()) {
@@ -158,7 +158,10 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             }
         }
     }
-
+    /**
+     * This function set the value int the graph before using some function
+     * the function all the tag value to zero and the weight of the Node to MAX_VALUE
+     */
     public void setValue() {
         Iterator iter = this.graph.nodeIter();
         while (iter.hasNext()) {
@@ -167,30 +170,14 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             node.setWeight(Double.MAX_VALUE);
         }
     }
-
-    public void DijkstraForShortestPath(Node_Data src, Node_Data dest) {
-        PriorityQueue<NodeData> pq = new PriorityQueue<>();
-        pq.add(src);
-        while (pq.size() != 0) {
-            Node_Data node = (Node_Data) pq.poll();
-            this.graph.getNode(node.getKey()).setTag(1);
-            if (node.getKey() == dest.getKey()) {
-                return;
-            }
-            Iterator iter = this.graph.edgeIter(node.getKey());
-            while (iter.hasNext()) {
-                EdgeData edge = (EdgeData) iter.next();
-                double weight_check = node.getWeight() + edge.getWeight();
-                if (this.graph.getNode(edge.getDest()).getWeight() == Double.MAX_VALUE) {
-                    pq.add(this.graph.getNode(edge.getDest()));
-                }
-                if (this.graph.getNode(edge.getDest()).getWeight() > weight_check) {
-                    this.graph.getNode(edge.getDest()).setWeight(weight_check);
-                }
-            }
-        }
-    }
-        public void DijkstraForCenter(int key){
+    /**
+     * @param key Starting node
+     *        This function finding the fastest route from node src to all other node in graph.
+     *        along the way the function are uptading the node weight which represent how much time.
+     *        it takes to reach from the node src to other node at the graph in the shortest way.
+     *        the function will end when we reach all node we can go meaning there is a path.
+     */
+        public void Dijkstra(int key){
         PriorityQueue<NodeData> PQ = new PriorityQueue<>();
         //Update the weight of each node to infinity and update the color(info) of all the nodes to white.
         //White node - means we have not visited it yet.
@@ -221,37 +208,21 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             this.graph.getNode(u.getKey()).setTag(1);
         }
     }
+    @Override
+    /**
+     *
+     * @param src - start node
+     * @param dest - end (target) node
+     * @return the minimal time it take to reach from src to dest in the using Dijkstra
+     */
 
     public double shortestPathDist(int src, int dest) {
-        if (this.graph.getNode(src) != null && this.graph.getNode(dest) != null){
-            //The weight of the path of a node to itself is 0.
-            if (src == dest){
-                return 0;
-            }
-            //setValue();
-            NodeData node = this.graph.getNode(src);
-            node.setWeight(0);
-            DijkstraForShortestPath((Node_Data) this.graph.getNode(src),(Node_Data) this.graph.getNode(dest));
-            //If the weight of dest different from infinitely,
-            // we will return the weight of the path from the node from which we scanned the graph(src) to dest
-            if (this.graph.getNode(dest).getWeight() != Double.MAX_VALUE) {
-                return this.graph.getNode(dest).getWeight();
-            }
-            else {
-                return -1;
-            }
-        }
-        else {
-            return -1;
-        }
-    }
-    public double shortestPathDist3(int src, int dest) {
         if (src == dest) return 0;
+        if(this.graph.getNode(src)==null||this.graph.getNode(dest)==null)return -1;
         setValue();
         NodeData node = this.graph.getNode(src);
         node.setWeight(0);
-        DijkstraForCenter(src);
-        //Dijkstra2(src);
+        Dijkstra(src);
         double ans = this.graph.getNode(dest).getWeight();
         if (ans == Double.MAX_VALUE) {
             return -1;
@@ -260,25 +231,26 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
         }
     }
 
-    private void Dijkstra(NodeData src, NodeData dest) {
-        if (src.getKey() == dest.getKey() && src.getTag() == 1) return;
-        Iterator iter = this.graph.edgeIter(src.getKey());
-        if (iter != null) {
-            while (iter.hasNext()) {
-                EdgeData edge = (Edge_Data) iter.next();
-                if (this.graph.getNode(edge.getDest()).getWeight() > this.graph.getNode(edge.getSrc()).getWeight() + edge.getWeight()) {
-                    this.graph.getNode(edge.getDest()).setWeight(this.graph.getNode(edge.getSrc()).getWeight() + edge.getWeight());
-                    src.setTag(1);
-                    Dijkstra(this.graph.getNode(edge.getDest()), dest);
-                }
-            }
-
-        }
-    }
     @Override
+    /**
+     *
+     * @param src - start node
+     * @param dest - end (target) node
+     * @return List of nodes representing the route between the src to dest
+     * The function using shortestPathDist3 to check if there is a route between the two nodes
+     * if the time isn't equal (-1) it means there is a route after the shortestPathDist are applied
+     * the nodes weight are updating and to find the route we are transpose the direction of the
+     * edge in the graph, and then we're checking which node that is neighbour to dest node are the node
+     * that takes us to dest we doing it by checking the (weight node + the edge weight) and if it equals
+     * too dest node weight we are adding it to our List and we now that this node is the parent of
+     * dest, and then we keep doing it until we reach dest.
+     * after we finish we are reversing the List, and then we will get final answer.
+     *
+     *
+     */
     public List<NodeData> shortestPath(int src, int dest) {
         List<NodeData> nodePathReavrse = new ArrayList<>();
-        double time = this.shortestPathDist3(src, dest);
+        double time = this.shortestPathDist(src, dest);
         if (time == -1) {
             return null;
         }
@@ -308,13 +280,24 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
         }
         return nodePath;
     }
-
+    @Override
+    /**
+     *
+     * @return The node center
+     * This function finding the center in the graph first we need to check if
+     * the graph is connected if not we return null
+     * after we check it we are going to call to shortestPathDist for each node
+     * and then the weight going to be updated for all node we take the eccentricity which is the longest
+     * distance between this node to other node
+     * after we check all node we are going to choose the node with the smaller eccentricity and this node going to
+     * be the center is graph.
+     */
     public NodeData center() {
         if(this.isConnected()==false||this.graph.nodeSize()==0) return null;
         double min = Double.MAX_VALUE;
         int ind =7;
         for (int i = 0; i < this.graph.nodeSize(); i++) {
-            DijkstraForCenter(i);
+            Dijkstra(i);
             double max = Double.MIN_VALUE;
             for (int j = 0; j < this.graph.nodeSize(); j++) {
 
@@ -334,32 +317,105 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     }
 
     @Override
-    //need to check why always return null
+    /**
+     * This function return list of NodeData
+     * the function gets a list of nodes that we are asking to travel somehow in the graph.
+     * the function need to return a list of nodes which represent a path that are visiting
+     * in all the node list we get and we need to find the path with the minimal time
+     * if there is now path from nodes in the list we are getting we gonna return null
+     * the function use dijkstra to hopefully find the shortest path
+     * this is a greedy algorithm and the solution will not be always the best solution.
+     */
     public List<NodeData> tsp(List<NodeData> cities) {
-        if(cities.isEmpty())
+        if(cities.size() == 0) {
             return null;
-        List<NodeData>ans =new LinkedList<NodeData>();
-        double min=Double.MAX_VALUE;
-        NodeData start= cities.get(0);
-        cities.remove(0);
-        int curr=0;
-        ans.add(start);
-        while(!cities.isEmpty())
-        {
-            for(int i=0;i<cities.size();i++)
-            {
-                if(shortestPathDist(start.getKey(), cities.get(i).getKey())<min){
-                    min=shortestPathDist(start.getKey(), cities.get(i).getKey());
-                    curr=i;
+        }
+        List<NodeData> ans = new ArrayList<NodeData>();
+        int start = Integer.MAX_VALUE;
+        double min = Integer.MAX_VALUE;
+        ArrayList<Integer> right_track = new ArrayList<>();
+        for (int i = 0; i < cities.size(); i++) {
+            ArrayList<Integer> track = new ArrayList<>();
+            int count = 1;
+            int index = cities.get(i).getKey();
+            track.add(index);
+            while (count < cities.size()) {
+                index = rec(index, track, cities);
+                if (index == -1) {
+                    break;
+                }
+                track.add(index);
+                count++;
+            }
+            if (index != -1) {
+                double weight = 0;
+                for (int j = 0; j < track.size()-1; j++) {
+                    weight += shortestPathDist(track.get(j), track.get(j+1));
+                }
+                System.out.println("wi: "+weight);
+                if (weight < min) {
+                    right_track.clear();
+                    min = weight;
+                    start = i;
+                    System.out.println("track added to right track");
+                    for (int j = 0; j < track.size(); j++) {
+                        right_track.add(track.get(j));
+                        System.out.print(track.get(j)+",");
+                    }
+                    System.out.println();
                 }
             }
-            start=cities.get(curr);
-            cities.remove(curr);
-            min=Double.MAX_VALUE;
-            ans.add(start);
+        }
+        System.out.println("right track");
+        for (int i = 0; i < right_track.size(); i++) {
+            System.out.print(right_track.get(i)+" ");
+        }
+        System.out.println();
+        for (int i = 0; i < right_track.size()-1; i++) {
+            List<NodeData> l = shortestPath(right_track.get(i), right_track.get(i+1));
+            for (int j = 0; j < l.size(); j++) {
+                System.out.print(l.get(j).getKey()+" ");
+            }
+            System.out.println();
+            if (i == 0) {
+                for (int j = 0; j < l.size(); j++) {
+                    ans.add(l.get(j));
+                }
+            }
+            else {
+                for (int j = 1; j < l.size(); j++) {
+                    ans.add(l.get(j));
+                }
+            }
+        }
+        if (ans.size() == 0) {
+            return null;
         }
         return ans;
     }
+
+    public int rec(int key, ArrayList<Integer> track, List<NodeData> cities) {
+        Dijkstra(key);
+        //PriorityQueue<NodeData> nodeData = new PriorityQueue<>();
+        int next_key = -1;
+        double min = Integer.MAX_VALUE;
+        for (int i = 0; i < cities.size(); i++) {
+            if (!track.contains(cities.get(i).getKey())) {
+                double len = this.graph.getNode(cities.get(i).getKey()).getWeight();
+                if (len < min) {
+                    min = len;
+                    next_key = cities.get(i).getKey();
+                }
+            }
+        }
+        return next_key;
+    }
+    /**
+     *
+     * @param file - the file name (may include a relative path).
+     * @return true if the graph has been saved to the file
+     * false if something went worng.
+     */
     @Override
     public boolean save(String file) {
         try {
@@ -415,7 +471,11 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             return false;
         }
     }
-
+    /**
+     *
+     * @param file - file name of JSON file
+     * @return  true if we succeeded to load the graph from the json file to our graph.
+     */
     @Override
     public boolean load(String file) {
         try
