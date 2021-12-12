@@ -70,12 +70,13 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
      *
      */
     public boolean isConnected() {
-        if (this.graph.nodeSize() == 1 || this.graph.nodeSize() == 0) return true;
+        if (this.graph.nodeSize() == 1 ) return true;
+        if (this.graph.nodeSize()==0) return false;
         DirectedWeightedGraph copy = this.copy();
         setTagzero(copy);
         Iterator iter = copy.nodeIter();
         NodeData node = (NodeData) iter.next();
-        DFS(copy, node);
+        BFS(copy, node);
         while (iter.hasNext()) {
             if (((NodeData) iter.next()).getTag() == 0) return false;
         }
@@ -83,7 +84,7 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
         setTagzero(copy);
         Iterator iter1 = copy.nodeIter();
         NodeData node1 = (NodeData) iter1.next();
-        DFS(copy, node1);
+        BFS(copy, node1);
         while (iter1.hasNext()) {
             if (((NodeData) iter1.next()).getTag() == 0) return false;
         }
@@ -112,6 +113,27 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
      * @param node starting node for traversal
      *        the function doing the classic DFS
      */
+    public void BFS(DirectedWeightedGraph g, NodeData node) {
+        int ans = 0;
+        LinkedList<Integer> queue = new LinkedList<Integer>();
+        node.setTag(1);
+        queue.add(node.getKey());
+        while (queue.size() != 0) {
+            int curr = queue.poll();
+            Iterator iter = g.edgeIter(curr);
+            if(iter!=null){
+            while (iter.hasNext()) {
+                EdgeData edge = (Edge_Data) iter.next();
+                int u = edge.getDest();
+                if (g.getNode(u) != null && g.getNode(u).getTag() == 0) {
+                    g.getNode(u).setTag(1);
+                    queue.add(g.getNode(u).getKey());
+                    ans = g.getNode(u).getKey();
+                }
+            }
+            }
+        }
+    }
     public  void DFS(DirectedWeightedGraph g, NodeData node) {
         node.setTag(1);
         Iterator iter = g.edgeIter(node.getKey());
@@ -191,17 +213,19 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
             //Black node - means we have updated the minimum weight of the node
             if (!(this.graph.getNode(u.getKey()).getTag()==1)) {
                 Iterator iter2 = this.graph.edgeIter(u.getKey());
-                while (iter2.hasNext()) {
-                    EdgeData ni = (EdgeData) iter2.next();
-                    if (!(this.graph.getNode(ni.getDest()).getTag()==1)) {
-                        double t = ni.getWeight() + this.graph.getNode(u.getKey()).getWeight();
-                        //Update the min weight of the neighbors of node u.
-                        if (this.graph.getNode(ni.getDest()).getWeight() > t) {
-                            this.graph.getNode(ni.getDest()).setWeight(t);
-                            //Update the parent node of edge ni.
-                            //parents.put(ni.getDest(), u.getK());
+                if (iter2 != null) {
+                    while (iter2.hasNext()) {
+                        EdgeData ni = (EdgeData) iter2.next();
+                        if (!(this.graph.getNode(ni.getDest()).getTag() == 1)) {
+                            double t = ni.getWeight() + this.graph.getNode(u.getKey()).getWeight();
+                            //Update the min weight of the neighbors of node u.
+                            if (this.graph.getNode(ni.getDest()).getWeight() > t) {
+                                this.graph.getNode(ni.getDest()).setWeight(t);
+                                //Update the parent node of edge ni.
+                                //parents.put(ni.getDest(), u.getK());
+                            }
+                            PQ.add(this.graph.getNode(ni.getDest()));
                         }
-                        PQ.add(this.graph.getNode(ni.getDest()));
                     }
                 }
             }
@@ -295,12 +319,11 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
     public NodeData center() {
         if(this.isConnected()==false||this.graph.nodeSize()==0) return null;
         double min = Double.MAX_VALUE;
-        int ind =7;
+        int ind =0;
         for (int i = 0; i < this.graph.nodeSize(); i++) {
             Dijkstra(i);
             double max = Double.MIN_VALUE;
             for (int j = 0; j < this.graph.nodeSize(); j++) {
-
                 double len = this.graph.getNode(j).getWeight();
                 if (max < len) {
                     max = len;
@@ -435,16 +458,18 @@ public class D_W_Graph_Algo implements DirectedWeightedGraphAlgorithms {
                 edgesObject = new JsonObject();
                 Iterator<EdgeData> edgeNode = this.graph.edgeIter(i.getKey());
                 ArrayList<EdgeData> edgeArray = new ArrayList<>();
-                while (edgeNode.hasNext()) {
-                    edgeArray.add(edgeNode.next());
-                }
-                for (EdgeData e : edgeArray) {
-                    edgesObject.addProperty("src", e.getSrc());
-                    edgesObject.addProperty("w", e.getWeight());
-                    edgesObject.addProperty("dest", e.getDest());
-                    JsonObject ob = edgesObject.deepCopy();
-                    Edges.add(ob);
+                if(edgeNode!=null) {
+                    while (edgeNode.hasNext()) {
+                        edgeArray.add(edgeNode.next());
+                    }
+                    for (EdgeData e : edgeArray) {
+                        edgesObject.addProperty("src", e.getSrc());
+                        edgesObject.addProperty("w", e.getWeight());
+                        edgesObject.addProperty("dest", e.getDest());
+                        JsonObject ob = edgesObject.deepCopy();
+                        Edges.add(ob);
 
+                    }
                 }
             }
             AllObj.add("Edges", Edges);

@@ -27,9 +27,8 @@ public class GUI implements ActionListener {
     private Mypanel panel;
     private String path;
     private boolean first = true;
-    private HashMap<Integer,Integer> pathLine = new HashMap<>();
-    private HashMap<Integer,Integer> tspLine = new HashMap<>();
-
+    private boolean center_paint = false;
+    private Geo_Location center;
 
     private JMenu fileMenu;
     private JMenu editMenu;
@@ -47,13 +46,12 @@ public class GUI implements ActionListener {
     private JMenuItem show_center;
     private JMenuItem show_shortest_path;
     private JMenuItem show_tsp;
+
+    private JMenuBar menuBar;
+
     // to write file name that you want to create
     private JButton button;
     private JTextField textField;
-
-    private JMenuBar menuBar;
-    private boolean center_paint = false;
-    private Geo_Location center;
 
     // to choose two node keys that you wish to perform a  shortest path algorithm
     private JButton but;
@@ -92,26 +90,29 @@ public class GUI implements ActionListener {
 
         public Mypanel() {
 
+            // going through all of the graph nodes
+            // and finding the geographoc location for each one of them
             Iterator iter = graph.nodeIter();
             while (iter.hasNext()) {
                 Node_Data node = (Node_Data) iter.next();
-                Point2d.put(node.getKey(),(Geo_Location)node.getLocation());
+                Geo_Location scale = scaleNode(node);
+                Point2d.put(node.getKey(),scale);
                 Iterator iter1 = graph.edgeIter(node.getKey());
                 while (iter1 != null && iter1.hasNext()) {
                     Edge_Data edge = (Edge_Data) iter1.next();
                     Node_Data node1 = (Node_Data) graph.getNode(edge.getDest());
-                    if (niber.get(node.getLocation()) == null) {
+                    Geo_Location scale2 = scaleNode(node1);
+                    if (niber.get(scale) == null) {
                         HashMap<Geo_Location, Edge_Data> init = new HashMap<Geo_Location, Edge_Data>();
-                        niber.put((Geo_Location) node.getLocation(), init);
-                        niber.get((Geo_Location) node.getLocation()).put((Geo_Location) node1.getLocation(), edge);
+                        niber.put(scale, init);
+                        niber.get(scale).put(scale2, edge);
                     } else {
-                        niber.get((Geo_Location) node.getLocation()).put((Geo_Location) node1.getLocation(), edge);
+                        niber.get(scale).put(scale2, edge);
                     }
-
                 }
             }
         }
-
+        // drawing the graph
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -138,40 +139,19 @@ public class GUI implements ActionListener {
                         g.setColor(Color.red);
                         g.drawLine((int) src.x(), (int) src.y(), (int) dest.x(), (int) dest.y());
                     }
-                    else{
+                    else if(edgeData.getTag()==-1) {
+                        g.setColor(Color.orange);
+                        g.drawLine((int) src.x(), (int) src.y(), (int) dest.x(), (int) dest.y());
+                    }
+                    else {
                         g.setColor(Color.black);
                         g.drawLine((int) src.x(), (int) src.y(), (int) dest.x(), (int) dest.y());
-//                    }
-//                    if (pathLine.get(edgeData.getSrc()) != null) {
-//                        if (pathLine.get(edgeData.getSrc()) == edgeData.getDest()) {
-//                            g.setColor(Color.red);
-//                            g.drawLine((int) src.x(), (int) src.y(), (int) dest.x(), (int) dest.y());
-//                        }
-//                    }
-//                    else if (tspLine.get(edgeData.getSrc()) != null) {
-//                        if (tspLine.get(edgeData.getSrc()) == edgeData.getDest()) {
-//                            g.setColor(Color.orange);
-//                            g.drawLine((int) src.x(), (int) src.y(), (int) dest.x(), (int) dest.y());
-//                        }
-//                    }
-//                    else {
-//                        g.setColor(Color.black);
-//                        g.drawLine((int) src.x(), (int) src.y(), (int) dest.x(), (int) dest.y());
                     }
-
-                    //}else{
-                    //    g.setColor(Color.YELLOW);
-                    //    g.drawLine((int) src.x(), (int) src.y(), (int) dest.x(), (int) dest.y());
-                    //}
-                    //Geo_Location midlle = new Geo_Location((src.x()+dest.x()),(src.y()+dest.y())/2,0);
                     g.setColor(Color.red);
-                    //g.setColor(Color.black);
                     Geo_Location inmid = new Geo_Location(dest.x()- src.x(), dest.y()-src.y(), 0);
                     Geo_Location MID = new Geo_Location(src.x()+0.7*inmid.x(),src.y()+0.7*inmid.y(),0);
-                    //            g.drawString(weight+"",(int)MID.x(),(int)MID.y());
-
                     g.setColor(Color.blue);
-                    // g.fillOval((int) MID.x()-3 , (int) MID.y()-3, 6, 6);
+                    // drawing the arrow that we will know the edge direction
                     int dx = (int)(dest.x()-src.x());
                     int dy = (int)(dest.y()-src.y());
                     double d = Math.sqrt(dx*dx+ dy*dy);
@@ -188,15 +168,14 @@ public class GUI implements ActionListener {
                     xn = x;
                     int[] xpoints = {(int)dest.x(), (int) xm, (int) xn};
                     int[] ypoints = {(int)dest.y(), (int) ym, (int) yn};
-                    // need to be updated to regular lines
                     g.fillPolygon(xpoints,ypoints,3);
                     g.setColor(Color.black);
                 }
             }
+            // if we want to draw the center of the graph
             if (center_paint) {
                 g.setColor(Color.green);
                 g.fillOval((int) center.x() -5, (int) center.y() -5, 15, 15);
-                //center_paint = false;
             }
         }
     }
@@ -207,11 +186,9 @@ public class GUI implements ActionListener {
         this.algo.init(this.graph);
         this.frame = new JFrame();
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //this.frame.setLayout(new GridLayout());
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.frame.getContentPane().setBackground(new Color(255, 255, 255, 255));
         this.frame.setSize(screenSize.width , screenSize.height);
-
 
         this.menuBar = new JMenuBar();
 
@@ -221,21 +198,19 @@ public class GUI implements ActionListener {
 
         this.load = new JMenuItem("load");
         this.save = new JMenuItem("save");
-        //this.edit = new JMenuItem("edit");
 
         this.deleteNode = new JMenuItem("remove node");
         this.deleteEdge = new JMenuItem("remove edge");
         this.addNode = new JMenuItem("add node");
         this.addEdge = new JMenuItem("add edge");
 
-        this.show_grpah = new JMenuItem("show graph");
+        this.show_grpah = new JMenuItem("show original graph");
         this.show_center = new JMenuItem("show center");
         this.show_shortest_path = new JMenuItem("show shortest path");
         this.show_tsp = new JMenuItem("show tsp");
 
         this.load.addActionListener(this);
         this.save.addActionListener(this);
-        //this.edit.addActionListener(this);
 
         this.deleteNode.addActionListener(this);
         this.deleteEdge.addActionListener(this);
@@ -249,7 +224,6 @@ public class GUI implements ActionListener {
 
         this.fileMenu.add(this.load);
         this.fileMenu.add(this.save);
-        //this.fileMenu.add(edit);
 
         this.editMenu.add(this.deleteNode);
         this.editMenu.add(this.deleteEdge);
@@ -267,15 +241,13 @@ public class GUI implements ActionListener {
 
         this.frame.setJMenuBar(this.menuBar);
         this.frame.setVisible(true);
-        //      this.frame.add(new Mypanel());
+        this.frame.setResizable(false);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        // loading a graph through json file
         if (e.getSource() == this.load) {
-            this.pathLine.clear();
-            this.tspLine.clear();
-            this.graph.graphClear();
             System.out.println("load has been clicked");
             JFileChooser fileChooser = new JFileChooser();
             int response = fileChooser.showOpenDialog(null);
@@ -283,23 +255,22 @@ public class GUI implements ActionListener {
                 File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
                 String file_name = String.valueOf(file);
                 this.path = file_name;
-                System.out.println(file);
-                System.out.println(file_name);
+                System.out.println(this.path);
                 if (!this.first) {
                     this.frame.remove(this.panel);
                     this.center_paint = false;
                 }
                 this.algo.load(file_name);
-                this.graph = (D_W_Graph) algo.getGraph();
+                this.graph = (D_W_Graph) this.algo.getGraph();
                 System.out.println(this.graph.nodeSize());
                 if (this.graph != null) {
-                    this.scaleGarph();
                     this.fetch();
                     this.frame.setVisible(true);
                 }
             }
             this.first = false;
         }
+        // saving the current graph into a file (creating new file)
         if (e.getSource() == this.save) {
             System.out.println("save has been clicked");
             button = new JButton("submit");
@@ -314,11 +285,14 @@ public class GUI implements ActionListener {
         }
         if (e.getSource() == button) {
             System.out.println("submit has been clicked");
-            algo.save(textField.getText());
+            this.algo.save(textField.getText());
             this.frame.remove(button);
             this.frame.remove(textField);
+            this.frame.remove(this.panel);
+            this.fetch();
+            this.frame.setVisible(true);
         }
-
+        // deleting a node from the graph
         if (e.getSource() == this.deleteNode) {
             System.out.println("delete node has been clicked");
             this.but1 = new JButton("remove");
@@ -336,15 +310,12 @@ public class GUI implements ActionListener {
             int removed_node = Integer.parseInt(this.node_key.getText());
             this.frame.remove(this.but1);
             this.frame.remove(this.node_key);
-            System.out.println(this.graph.nodeSize());
             this.graph.removeNode(removed_node);
-            System.out.println(this.graph.nodeSize());
-            System.out.println(this.graph.getNode(37));
             this.frame.remove(this.panel);
             this.fetch();
             this.frame.setVisible(true);
         }
-
+        // deleting an edge from the graph
         if (e.getSource() == this.deleteEdge) {
             this.but2 = new JButton("remove");
             this.but2.setBounds(420, 0, 80,30);
@@ -370,6 +341,7 @@ public class GUI implements ActionListener {
             this.fetch();
             this.frame.setVisible(true);
         }
+        // adding an edge to the graph
         if (e.getSource() == this.addEdge) {
             this.but3 = new JButton("connect");
             this.but3.setBounds(630, 0, 100,30);
@@ -401,6 +373,7 @@ public class GUI implements ActionListener {
             this.fetch();
             this.frame.setVisible(true);
         }
+        // adding a node to the graph
         if (e.getSource() == this.addNode) {
             this.but4 = new JButton("add");
             this.but4.setBounds(420, 0, 80,30);
@@ -421,49 +394,37 @@ public class GUI implements ActionListener {
             this.frame.remove(this.but4);
             this.frame.remove(this.x_coor);
             this.frame.remove(this.y_coor);
-            //NodeData nodeData = new Node_Data(new Geo_Location(x, y, 0));
             this.addNode(x, y);
-            //this.graph.addNode(nodeData);
-            Iterator iterator = this.graph.nodeIter();
-            this.checKeys(iterator);
-            this.frame.remove(this.panel);
-            this.scaleGarph();
             this.fetch();
             this.frame.setVisible(true);
         }
-
-        // Run menu
+        // showing the original graph
         if (e.getSource() == this.show_grpah) {
             System.out.println("show has been clicked");
-            this.pathLine.clear();
-            this.tspLine.clear();
-            //this.isShown = true;
-            //this.center_paint = false;
             Iterator iter = this.graph.edgeIter();
             while (iter.hasNext()) {
                 EdgeData edge = (EdgeData) iter.next();
                 edge.setTag(0);
             }
             this.center_paint = false;
-            this.frame.remove(this.panel);
-            this.algo.load(this.path);
-            this.graph = (D_W_Graph) algo.getGraph();
+            System.out.println(this.path);
             System.out.println(this.graph.nodeSize());
-            if (this.graph != null) {
-                this.scaleGarph();
-                this.fetch();
-                this.frame.setVisible(true);
-            }
-        }
-        if (e.getSource() == this.show_center) {
-            NodeData cen = this.algo.center();
-            Geo_Location coor = (Geo_Location) this.graph.getNode(cen.getKey()).getLocation();
-            this.center_paint = true;
-            this.center = coor;
             this.frame.remove(this.panel);
             this.fetch();
             this.frame.setVisible(true);
         }
+        // drawing the center of the graph
+        if (e.getSource() == this.show_center) {
+            NodeData cen = this.algo.center();
+            Geo_Location coor = (Geo_Location) this.graph.getNode(cen.getKey()).getLocation();
+            Geo_Location coorScaled = scaleNode(cen);
+            this.center_paint = true;
+            this.center = coorScaled;
+            this.frame.remove(this.panel);
+            this.fetch();
+            this.frame.setVisible(true);
+        }
+        // drawing the shortest path between two given nodes
         if (e.getSource() == this.show_shortest_path) {
             Iterator iter = this.graph.edgeIter();
             this.but = new JButton("submit");
@@ -471,34 +432,40 @@ public class GUI implements ActionListener {
             this.but.addActionListener(this);
             this.src = new JTextField();
             this.src.setBounds(0, 0, 210,30);
-            //this.src.setPreferredSize(new Dimension(100, 40));
             this.src.setText("enter source key");
             this.dest = new JTextField();
             this.dest.setBounds(210, 0, 210,30);
-            //this.dest.setPreferredSize(new Dimension(100, 40));
             this.dest.setText("enter dest key");
             this.frame.add(src);
             this.frame.add(dest);
             this.frame.add(but);
         }
         if (e.getSource() == this.but) {
-            this.pathLine.clear();
             int src_key = Integer.parseInt(this.src.getText());
             int dest_key = Integer.parseInt(this.dest.getText());
             this.frame.remove(but);
             this.frame.remove(src);
             this.frame.remove(dest);
+            Iterator iter = this.graph.edgeIter();
+            while (iter.hasNext()) {
+                EdgeData edge = (EdgeData) iter.next();
+                edge.setTag(0);
+            }
             List<NodeData> nodeDataList = this.algo.shortestPath(src_key, dest_key);
             String ch = "";
-            for (int i = 0; i < nodeDataList.size()-1; i++) {
-                EdgeData edgeData=(EdgeData)this.graph.getEdge(nodeDataList.get(i).getKey(),nodeDataList.get(i+1).getKey());
-                edgeData.setTag(1);
-                this.pathLine.put(edgeData.getSrc(),edgeData.getDest());
+            if (nodeDataList != null) {
+                for (int i = 0; i < nodeDataList.size()-1; i++) {
+                    EdgeData edgeData=(EdgeData)this.graph.getEdge(nodeDataList.get(i).getKey(),nodeDataList.get(i+1).getKey());
+                    EdgeData edgeData1=(EdgeData)this.graph.getEdge(nodeDataList.get(i+1).getKey(),nodeDataList.get(i).getKey());
+                    edgeData.setTag(1);
+                    edgeData1.setTag(1);
+                }
             }
-            this.tspLine.clear();
+            this.frame.remove(this.panel);
             this.fetch();
             this.frame.setVisible(true);
         }
+        // drawing the tsp track between given nodes
         if (e.getSource() == this.show_tsp) {
             this.but5 = new JButton("submit");
             this.but5.addActionListener(this);
@@ -510,7 +477,6 @@ public class GUI implements ActionListener {
             this.frame.add(this.but5);
         }
         if (e.getSource() == this.but5) {
-            this.tspLine.clear();
             String [] str_keys = this.nodes_key.getText().split(",");
             this.frame.remove(this.but5);
             this.frame.remove(this.nodes_key);
@@ -518,53 +484,51 @@ public class GUI implements ActionListener {
             for (int i = 0; i < keys.length; i++) {
                 keys[i] = Integer.parseInt(str_keys[i]);
             }
-
             System.out.println("keys size: "+keys.length);
             for (int i = 0; i < keys.length; i++) {
                 System.out.print(keys[i]+" ");
             }
-            System.out.println();
-
             List<NodeData> nodess = new ArrayList<>();
             for (int i = 0; i < keys.length; i++) {
                 nodess.add(this.graph.getNode(keys[i]));
             }
-            System.out.println("nodes size: "+nodess.size());
-            for (int i = 0; i < nodess.size(); i++) {
-                System.out.print(nodess.get(i).getKey()+" ");
+            Iterator iter = this.graph.edgeIter();
+            while (iter.hasNext()) {
+                EdgeData edge = (EdgeData) iter.next();
+                edge.setTag(0);
             }
-            System.out.println();
-
             List<NodeData> nodeDataList = this.algo.tsp(nodess);
             String ch = "";
             System.out.println("size: "+nodeDataList.size());
-            for (int i = 0; i < nodeDataList.size()-1; i++) {
-                EdgeData edgeData=(EdgeData)this.graph.getEdge(nodeDataList.get(i).getKey(),nodeDataList.get(i+1).getKey());
-                this.tspLine.put(edgeData.getSrc(),edgeData.getDest());
+            if (nodeDataList != null) {
+                for (int i = 0; i < nodeDataList.size()-1; i++) {
+                    EdgeData edgeData=(EdgeData)this.graph.getEdge(nodeDataList.get(i).getKey(),nodeDataList.get(i+1).getKey());
+                    EdgeData edgeData1 =(EdgeData)this.graph.getEdge(nodeDataList.get(i+1).getKey(),nodeDataList.get(i).getKey());
+                    edgeData.setTag(-1);
+                    edgeData1.setTag(-1);
+                }
             }
-            System.out.println(tspLine.size());
-            this.pathLine.clear();
+            this.frame.remove(this.panel);
             this.fetch();
             this.frame.setVisible(true);
         }
     }
-
+    // loading and drawing a graph through json
     public void load_from_json(String json_file) {
         this.algo.load(json_file);
         this.graph = (D_W_Graph) this.algo.getGraph();
         if (this.graph != null) {
-            this.scaleGarph();
             this.fetch();
             this.frame.setVisible(true);
         }
         this.first = false;
     }
-
+    // drawing the graph
     public void fetch() {
         this.panel = new Mypanel();
         this.frame.add(this.panel);
     }
-
+    // calculating the max x coordinate of the graph nodes
     public double maxX() {
         double max = Integer.MIN_VALUE;
         Iterator iter = this.graph.nodeIter();
@@ -576,7 +540,7 @@ public class GUI implements ActionListener {
         }
         return max;
     }
-
+    // calculating the min x coordinate of the graph nodes
     public double minX() {
         double min = Integer.MAX_VALUE;
         Iterator iter = this.graph.nodeIter();
@@ -588,7 +552,7 @@ public class GUI implements ActionListener {
         }
         return min;
     }
-
+    // calculating the max y coordinate of the graph nodes
     public double maxY() {
         double max = Integer.MIN_VALUE;
         Iterator iter = this.graph.nodeIter();
@@ -600,7 +564,7 @@ public class GUI implements ActionListener {
         }
         return max;
     }
-
+    // calculating the min y coordinate of the graph nodes
     public double minY() {
         double min = Integer.MAX_VALUE;
         Iterator iter = this.graph.nodeIter();
@@ -612,7 +576,7 @@ public class GUI implements ActionListener {
         }
         return min;
     }
-
+    // the add node to the graph function
     public void addNode(double x, double y) {
         checKeys(this.graph.nodeIter());
         Geo_Location p;
@@ -621,11 +585,11 @@ public class GUI implements ActionListener {
         node = new Node_Data(p, this.graph.nodeSize());
         this.graph.addNode(node);
     }
-
+    // the add node to the graph function
     public void add_edge(int src, int dest, double weight) {
         graph.connect(src, dest, weight);
     }
-
+    // checking the keys of the graph nodes
     public void checKeys(Iterator<NodeData> temp) {
         int key = Integer.MIN_VALUE;
         while (temp.hasNext()) {
@@ -637,25 +601,15 @@ public class GUI implements ActionListener {
         if (key == Integer.MIN_VALUE) key = 0;
         Node_Data.key_track = ++key;
     }
-
-    public void scaleGarph() {
+    public Geo_Location scaleNode(NodeData n){
         double maxx = (double) this.maxX();
         double minx = (double) this.minX();
         double maxy = (double) this.maxY();
         double miny = (double) this.minY();
-        Iterator iter = this.graph.nodeIter();
-        while (iter.hasNext()) {
-            Node_Data node = (Node_Data) iter.next();
-            Geo_Location g = (Geo_Location) node.getLocation();
-            double yss = (double) g.y();
-            double newX = (double) (this.frame.getWidth()-100) * ((double) g.x() - minx) / (maxx - minx)+30;
-            double newY = (double) (this.frame.getHeight()-200) * ((double) g.y() - miny) / (maxy - miny)+30;
-            Geo_Location gN = new Geo_Location(newX, newY, 0);
-            node.setLocation(gN);
-        }
+        double newX = (double) (this.frame.getWidth()-100) * ((double) n.getLocation().x() - minx) / (maxx - minx)+30;
+        double newY = (double) (this.frame.getHeight()-200) * ((double) n.getLocation().y() - miny) / (maxy - miny)+30;
+        Geo_Location ans = new Geo_Location(newX,newY,0);
+        return ans;
     }
-    public static void main (String[]args){
-        GUI g = new GUI();
 
-    }
 }

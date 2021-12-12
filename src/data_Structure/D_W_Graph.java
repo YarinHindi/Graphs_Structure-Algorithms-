@@ -4,7 +4,6 @@ import api.DirectedWeightedGraph;
 import api.EdgeData;
 import api.NodeData;
 import java.util.Iterator;
-import javafx.geometry.Point3D;
 //import Node_Data;
 
 import java.util.*;
@@ -27,6 +26,80 @@ public class D_W_Graph implements DirectedWeightedGraph {
     public boolean edgeIterAllflag=false;
     public boolean nodeIterflag=false;
     private int keepCurrEdge=0;
+
+    public  class OurNodeIter implements Iterator<NodeData>{
+        private int ourMC;
+        Iterator<NodeData> HELPER;
+
+        public OurNodeIter(){
+            this.ourMC=MC;
+            this.HELPER= nodeIter();
+        }
+        private void isValid(){
+           if(ourMC!=MC) throw new RuntimeException("Iterator isn't valid anymore");
+        }
+
+        @Override
+        public boolean hasNext() {
+            isValid();
+           return HELPER.hasNext();
+        }
+
+        @Override
+        public NodeData next() {
+            isValid();
+            return HELPER.next();
+        }
+    }
+
+    public class OurEdgeIter implements Iterator<EdgeData>{
+        private int ourMC;
+        Iterator<EdgeData> HELPER;
+
+        public OurEdgeIter(){
+            this.ourMC=MC;
+            this.HELPER= edgeIter();
+        }
+        private void isValid(){
+            if(ourMC!=MC) throw new RuntimeException("Iterator isn't valid anymore");
+        }
+
+        @Override
+        public boolean hasNext() {
+            isValid();
+            return HELPER.hasNext();
+        }
+
+        @Override
+        public EdgeData next() {
+            isValid();
+            return HELPER.next();
+        }
+    }
+    public class OurEdgeIterByKey implements Iterator<EdgeData>{
+        private int ourMC;
+        Iterator<EdgeData> HELPER;
+
+        public OurEdgeIterByKey(){
+            this.ourMC=MC;
+            this.HELPER= edgeIter();
+        }
+        private void isValid(){
+            if(ourMC!=MC) throw new RuntimeException("Iterator isn't valid anymore");
+        }
+
+        @Override
+        public boolean hasNext() {
+            isValid();
+            return HELPER.hasNext();
+        }
+
+        @Override
+        public EdgeData next() {
+            isValid();
+            return HELPER.next();
+        }
+    }
 
 
     public D_W_Graph(D_W_Graph other){

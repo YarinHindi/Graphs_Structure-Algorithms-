@@ -41,7 +41,4 @@ public class Ex2 {
         graph_gui.load_from_json(json_file);
     }
 
-    public static void main(String[] args) {
-        runGUI("C:\\Users\\matan\\IdeaProjects\\Graphs_Structure-Algorithms-\\data\\G3.json");
-    }
 }

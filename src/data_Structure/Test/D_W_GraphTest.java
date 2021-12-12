@@ -53,16 +53,11 @@ class D_W_GraphTest {
         graph.addNode(node3);
         graph.addNode(node4);
         graph.addNode(node5);
-        Iterator iter = graph.nodeIter();
-        int i=1;
-        while (iter.hasNext()){
-            Node_Data nodecurr = (Node_Data) iter.next();
-            assertEquals(graph.getNode(i),nodecurr);
-            i++;
+
 
 
         }
-    }
+
 
     @Test
     void edgeIterAlledge() {

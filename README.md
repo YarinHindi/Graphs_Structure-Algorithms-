@@ -100,34 +100,20 @@ Main | Creates a jar file that runs the projects.
 # Simulation results
 node size | edge size | build time | isConnected time | center time | transpose time
 --- | --- | --- | --- | --- | ---
-1,000 | 9000 | 195 ms | 216 ms | 87 ms | 199 ms
+1,000 | 9,000 | 195 ms | 216 ms | 1.87 sec | 199 ms
 10,000 | 100,000 | 616 ms | 767 ms | 204 sec | 775 ms
-100,000 | 1,000,000 | 4.5 sec | 3.871 sec | - | 3.91
-1,000,000 |  |  |  |  |  |
+100,000 | 1,000,000 | 4.5 sec | 3.871 sec | - | 3.91 sec
+1,000,000 | 20,000,000 | 25.4 sec | 21.5 sec | - | 22.7 sec
 
 # UML
-![image](https://user-images.githubusercontent.com/63747865/142432046-89d3f326-4c27-4d53-86e0-ad4f762266e6.png)
+![image](https://user-images.githubusercontent.com/63747865/145728360-c602caed-8626-4ecb-8108-9742dde9b1f6.png)
 
 # How to run
-Run the main.py file, with the right json file that present building and csv file that present calls.
+Run the main.java file, with the right json file that present graph.
+Need to put Ex2.jar(path) ans graph.json(path)
 Template for running the algorithm:
 
-python main.py <building json> <calls csv> <output file name>
-
-
-Example for running the algorithm:
-
-python main.py Buildings//B3.json Calls//Calls_c.csv output
-
-Template for running the test simulation:
-
-java -jar Ex1_checker_V1.2_obf.jar <Id's> <building json> <calls csv> <output file name>
-
-
-Example for running the test simulation:
-
-java -jar Ex1_checker_V1.2_obf.jar 12345 B3.json Calls_c.csv output.log
-
+java -jar Ex2.jar <grpah json>
 
 # project creators
 Matan Yarin Shimon & Yarin Hindi

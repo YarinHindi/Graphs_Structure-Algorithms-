@@ -24,6 +24,7 @@ class D_W_Graph_AlgoTest {
     Node_Data node7 = new Node_Data(new Geo_Location(2,2,2));
     Node_Data node8 = new Node_Data(new Geo_Location(3,3,3));
     Node_Data node9 = new Node_Data(new Geo_Location(3,3,3));
+
     @Test
     void init() {
         graph = new D_W_Graph();
@@ -66,10 +67,11 @@ class D_W_Graph_AlgoTest {
     void isConnected() {
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        algo.load("C:\\Users\\yarin\\Desktop\\1000Nodes.json");
+        algo.load("C:\\Users\\yarin\\Desktop\\10000Nodes.json");
         assertEquals(algo.isConnected(),true);
-        algo.load("C:\\Users\\yarin\\Desktop\\G2.json");
-        assertEquals(algo.isConnected(),true);
+        ///System.out.println(algo.getGraph().edgeSize());
+//        algo.load("C:\\Users\\yarin\\Desktop\\G2.json");
+//        assertEquals(algo.isConnected(),true);
 
     }
 
@@ -77,7 +79,7 @@ class D_W_Graph_AlgoTest {
     void DFS() {
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        algo.load("C:\\Users\\yarin\\Desktop\\G2.json");
+        algo.load("a.json");
         algo.DFS(algo.getGraph(),algo.getGraph().getNode(0));
         for (int i = 0; i < algo.getGraph().nodeSize(); i++) {
             assertEquals(algo.getGraph().getNode(i).getTag(),1);
@@ -89,7 +91,7 @@ class D_W_Graph_AlgoTest {
     void g_transopse() {
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        algo.load("C:\\Users\\yarin\\Desktop\\1000Nodes.json");
+        algo.load("C:\\Users\\yarin\\Desktop\\100000.json");
         D_W_Graph copy = (D_W_Graph) algo.copy();
         algo.G_transopse(copy);
         if(copy.getEdge(1,2)!=null&&algo.getGraph().getEdge(2,1)!=null){
@@ -104,14 +106,14 @@ class D_W_Graph_AlgoTest {
     void shortestPathDist() {
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        algo.load("C:\\Users\\yarin\\Desktop\\1000Nodes.json");
-        double a = algo.shortestPathDist(0,2);
-        for (int i = 1; i < algo.getGraph().nodeSize(); i++) {
-            assertNotEquals(algo.getGraph().getNode(i).getWeight(),0);
+        algo.load("C:\\Users\\yarin\\Desktop\\100000.json");
+        double a = algo.shortestPathDist(20,50);
+        System.out.println(a);
+
         }
 
 
-    }
+  //  }
     @Test
     void shortestPath() {
         graph = new D_W_Graph();
@@ -179,20 +181,39 @@ class D_W_Graph_AlgoTest {
     @Test
     void save() {
 
+//        graph = new D_W_Graph();
+//        algo = new D_W_Graph_Algo();
+//        algo.load("C:\\Users\\yarin\\Desktop\\G2.json");
+//        algo.save("a.json");
+//        algo.load("C:\\Users\\yarin\\IdeaProjects\\Graphs_Structure-Algorithms-\\a.json");
+//        assertEquals(algo.getGraph().edgeSize(),80);
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        algo.load("C:\\Users\\yarin\\Desktop\\G2.json");
+        graph.addNode(node1);
+        graph.addNode(node2);
+        graph.addNode(node3);
+        graph.addNode(node4);
+        graph.addNode(node5);
+        node1.setLocation(new Geo_Location(2500,5000,0));
+        node2.setLocation(new Geo_Location(5000,5000,0));
+        node3.setLocation(new Geo_Location(3500,2500,0));
+        node4.setLocation(new Geo_Location(100,100,0));
+        node5.setLocation(new Geo_Location(10000,10000,0));
+        graph.connect(0,1,4);
+        graph.connect(0,2,10);
+        graph.connect(1,2,10);
+        graph.connect(3,0,2);
+        graph.connect(1,4,9);
+        algo.init(graph);
         algo.save("a.json");
-        algo.load("C:\\Users\\yarin\\IdeaProjects\\Graphs_Structure-Algorithms-\\a.json");
-        assertEquals(algo.getGraph().edgeSize(),80);
     }
 
     @Test
     void load() {
         graph = new D_W_Graph();
         algo = new D_W_Graph_Algo();
-        algo.load("C:\\Users\\yarin\\Desktop\\G2.json");
-        assertEquals(algo.getGraph().nodeSize(),31);
-        assertEquals(algo.getGraph().edgeSize(),80);
+        algo.load("C:\\Users\\yarin\\Desktop\\100000.json");
+//        assertEquals(algo.getGraph().nodeSize(),31);
+//        assertEquals(algo.getGraph().edgeSize(),80);
     }
 }
